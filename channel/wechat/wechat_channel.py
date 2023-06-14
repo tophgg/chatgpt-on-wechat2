@@ -121,11 +121,11 @@ class WechatChannel(ChatChannel):
 
     def login_callback(self):
         print('Login successful')
-        self.send(Reply(type=ReplyType.TEXT, content="我来了"), Context(kwargs={"receiver": "@@2aaef1e12a98a84f510652e3614fc189b988a70f53926ad8de097ae09823773f"}))
+        WechatChannel().send(Reply(type=ReplyType.TEXT, content="我来了"), Context(kwargs={"receiver": "rpdhao"}))
         def dd():
             now = datetime.datetime.now()
             ts = now.strftime('%Y-%m-%d %H:%M:%S')
-            self.send(Reply(type=ReplyType.TEXT, content="整点报时,现在是"+ts), Context(kwargs={"receiver": "@@2aaef1e12a98a84f510652e3614fc189b988a70f53926ad8de097ae09823773f"}))
+            self.send(Reply(type=ReplyType.TEXT, content="整点报时,现在是"+ts), Context(kwargs={"receiver": "rpdhao"}))
         _start_schedule_deamon(dd)
     def logout_callback(self):
         print('Logout')
