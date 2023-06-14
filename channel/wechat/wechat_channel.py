@@ -9,6 +9,8 @@ import json
 import os
 import threading
 import time
+import schedule
+import datetime
 
 import requests
 
@@ -99,6 +101,15 @@ def qrCallback(uuid, status, qrcode):
         qr.make(fit=True)
         qr.print_ascii(invert=True)
 
+def _start_schedule_deamon(dd):
+    schedule.every(30).seconds.do(dd)
+    def schedule_run():
+        while True:
+            schedule.run_pending()
+            time.sleep(1)
+    t = threading.Thread(target=schedule_run)
+    t.setDaemon(True)
+    t.start()
 
 @singleton
 class WechatChannel(ChatChannel):
@@ -110,7 +121,12 @@ class WechatChannel(ChatChannel):
 
     def login_callback(self):
         print('Login successful')
-
+        self.send(Reply(type=ReplyType.TEXT, content="我来了"), Context(kwargs={"receiver": "@@2aaef1e12a98a84f510652e3614fc189b988a70f53926ad8de097ae09823773f"}))
+        def dd():
+            now = datetime.datetime.now()
+            ts = now.strftime('%Y-%m-%d %H:%M:%S')
+            self.send(Reply(type=ReplyType.TEXT, content="整点报时,现在是"+ts)), Context(kwargs={"receiver": "@@2aaef1e12a98a84f510652e3614fc189b988a70f53926ad8de097ae09823773f"})
+        _start_schedule_deamon(dd)
     def logout_callback(self):
         print('Logout')
         self.startup()
@@ -122,7 +138,7 @@ class WechatChannel(ChatChannel):
         status_path = os.path.join(get_appdata_dir(), "itchat.pkl")
         itchat.auto_login(
             enableCmdQR=2,
-            hotReload=hotReload,
+            hotReload=False,
             statusStorageDir=status_path,
             qrCallback=qrCallback,
             loginCallback=self.login_callback,
