@@ -121,12 +121,7 @@ class WechatChannel(ChatChannel):
 
     def login_callback(self):
         print('Login successful')
-        WechatChannel().send(Reply(type=ReplyType.TEXT, content="我来了"), Context(kwargs={"receiver": "rpdhao"}))
-        def dd():
-            now = datetime.datetime.now()
-            ts = now.strftime('%Y-%m-%d %H:%M:%S')
-            self.send(Reply(type=ReplyType.TEXT, content="整点报时,现在是"+ts), Context(kwargs={"receiver": "rpdhao"}))
-        _start_schedule_deamon(dd)
+        
     def logout_callback(self):
         print('Logout')
         self.startup()
@@ -138,17 +133,26 @@ class WechatChannel(ChatChannel):
         status_path = os.path.join(get_appdata_dir(), "itchat.pkl")
         itchat.auto_login(
             enableCmdQR=2,
-            hotReload=False,
+            hotReload=True,
             statusStorageDir=status_path,
             qrCallback=qrCallback,
             loginCallback=self.login_callback,
             exitCallback=self.logout_callback
         )
+        print('statusStorageDir:', status_path)
         self.user_id = itchat.instance.storageClass.userName
         self.name = itchat.instance.storageClass.nickName
         logger.info("Wechat login success, user_id: {}, nickname: {}".format(self.user_id, self.name))
         # start message listener
         itchat.run()
+        
+        print('startup running')
+        WechatChannel().send(Reply(type=ReplyType.TEXT, content="我来了"), Context(kwargs={"receiver": "rpdhao"}))
+        def dd():
+            now = datetime.datetime.now()
+            ts = now.strftime('%Y-%m-%d %H:%M:%S')
+            WechatChannel().send(Reply(type=ReplyType.TEXT, content="整点报时,现在是"+ts), Context(kwargs={"receiver": "rpdhao"}))
+        _start_schedule_deamon(dd)
 
     # handle_* 系列函数处理收到的消息后构造Context，然后传入produce函数中处理Context和发送回复
     # Context包含了消息的所有信息，包括以下属性
