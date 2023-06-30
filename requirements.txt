@@ -7,3 +7,7 @@ chardet>=5.1.0
 Pillow
 pre-commit
 schedule
+urllib3>=1.26.0
+--extra-index-url https://pypi.python.org/simple
+replicate>=0.7.0
+langid
